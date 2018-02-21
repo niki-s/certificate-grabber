@@ -32,7 +32,8 @@ def main():
 
 	# save certificate info in a csv
 	for ip in iplist:
-		print ip[2]
+		print
+		print "cert found for", ip[0], "is:", ip[2]
 		if ip[2] != "no cert or error":
 			version = ip[2].version
 			fingerprint = ip[2].fingerprint
