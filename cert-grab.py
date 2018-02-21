@@ -2,6 +2,7 @@ import ssl
 # for whatever reason cryptography doesn't exist for python3??? Or I'm bad at looking
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
 import sys
 
 def main():
@@ -25,32 +26,39 @@ def main():
 		try:
 			cert = ssl.get_server_certificate((ip[0], int(ip[1])))
 			cert_txt = x509.load_pem_x509_certificate(cert.encode('ascii','ignore'), default_backend())
-			print type(cert_txt)
+			#print type(cert_txt)
 			ip.append(cert_txt)
 		except:
 			ip.append("no cert or error")
 
 	# save certificate info in a csv
 	for ip in iplist:
-		print
-		print "cert found for", ip[0], "is:", ip[2]
+		# create a string c of all the important elements in the cert (or at least most of them)
+		# currently unneeded additions are commented out
 		if ip[2] != "no cert or error":
-			version = ip[2].version
-			fingerprint = ip[2].fingerprint
-			serial = ip[2].serial_number
-			publicKey = ip[2].public_key()
-			notValidBefore = ip[2].not_valid_before
-			notValidAfter = ip[2].not_valid_after
-			issuer = ip[2].issuer
-			subject = ip[2].subject
-			hashAlg = ip[2].signature_hash_algorithm
+			c = str(ip[2].version)
+			#fingerprint = ip[2].fingerprint(hashes.SHA256())
+			c = c  + ',' + str(ip[2].serial_number)
+			#publicKey = ip[2].public_key()
+			c = c  + ',' + str(ip[2].not_valid_before)
+			c = c  + ',' + str(ip[2].not_valid_after)
+			for attribute in ip[2].issuer: 
+				#countryName, organizationName, commonName
+				c = c  + ',' + str(attribute.value)
+			for attribute in ip[2].subject:
+				#countryName, stateOrProvinceName, localityName, organizationName, commonName
+				c = c  + ',' + str(attribute.value)
+
+			#hashAlg = ip[2].signature_hash_algorithm
 			#sigBytes = ip[2].signature
 			#bytes = ip[2].tbs_certificate_bytes
-			
+
 			#there has to be a better way to do this...but the certificate isn't iterable...
-			c = str(version)+','+str(fingerprint)+','+str(serial)+','+str(publicKey)+','+\
-				str(notValidBefore)+','+str(notValidAfter)+','+str(issuer)+','+str(subject)+','+\
-				str(hashAlg)
+			# yay! better way found above
+			#c = str(version)+','+str(fingerprint)+','+str(serial)+','+str(publicKey)+','+\
+			#	str(notValidBefore)+','+str(notValidAfter)+','+str(issuer)+','+str(subject)+','+\
+			#	str(hashAlg)
+
 		else:
 			c = "no cert or error"
 
