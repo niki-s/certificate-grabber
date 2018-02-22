@@ -37,7 +37,7 @@ def main():
 	f = open("results_certs_grab.csv", 'w')
 
 	# insert labels for all the columns as the first entry
-	c = "ip, port, version, serial number, public key length, not valid before, not valid after, issuer country name,\
+	c = "ip:port, version, serial number, public key length, not valid before, not valid after, issuer country name,\
 issuer organization name, issuer common name, subject country name, subject state or province, \
 subject locality name, subject organization name, subject common name, hash algorithm \n"
 	f.write(c)
@@ -46,8 +46,7 @@ subject locality name, subject organization name, subject common name, hash algo
 		# create a string c of all the important elements in the cert (or at least most of them)
 		# currently unneeded additions are commented out
 		if ip[2] != "no cert or error":
-			c = str(ip[0])
-			c = c  + ',' + str(ip[1])
+			c = str(ip[0]) + ':' + str(ip[1])
 			c = c  + ',' + str(ip[2].version)
 			c = c  + ',' + str(ip[2].serial_number)
 			c = c  + ',' + str(ip[2].public_key().key_size)
