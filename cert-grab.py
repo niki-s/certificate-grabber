@@ -37,7 +37,7 @@ def main():
 	f = open("results_certs_grab.csv", 'w')
 
 	# insert labels for all the columns as the first entry
-	c = "ip:port, version, serial number, public key length, not valid before, not valid after, issuer country name,\
+	c = "ip, port, version, serial number, public key length, not valid before, not valid after, issuer country name,\
 issuer organization name, issuer common name, subject country name, subject state or province, \
 subject locality name, subject organization name, subject common name, hash algorithm \n"
 	f.write(c)
