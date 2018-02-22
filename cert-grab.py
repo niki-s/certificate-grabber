@@ -5,6 +5,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 import sys
 
+
 def main():
 	# open the file listed in the command line
 	if len(sys.argv) > 1:
@@ -32,14 +33,22 @@ def main():
 			ip.append("no cert or error")
 
 	# save certificate info in a csv
+	erroredIps = []
+	f = open("cert_results.csv", 'w')
+
+	# insert labels for all the columns as the first entry
+	c = "version, serial number, public key length, not valid before, not valid after, issuer country name,\
+issuer organization name, issuer common name, subject country name, subject state or province, \
+subject locality name, subject organization name, subject common name, hash algorithm \n"
+	f.write(c)
+
 	for ip in iplist:
 		# create a string c of all the important elements in the cert (or at least most of them)
 		# currently unneeded additions are commented out
 		if ip[2] != "no cert or error":
 			c = str(ip[2].version)
-			#fingerprint = ip[2].fingerprint(hashes.SHA256())
 			c = c  + ',' + str(ip[2].serial_number)
-			#publicKey = ip[2].public_key()
+			c = c  + ',' + str(ip[2].public_key().key_size)
 			c = c  + ',' + str(ip[2].not_valid_before)
 			c = c  + ',' + str(ip[2].not_valid_after)
 			for attribute in ip[2].issuer: 
@@ -49,7 +58,9 @@ def main():
 				#countryName, stateOrProvinceName, localityName, organizationName, commonName
 				c = c  + ',' + str(attribute.value)
 
-			#hashAlg = ip[2].signature_hash_algorithm
+			c = c  + ',' + str(ip[2].signature_hash_algorithm.name)
+			c = c + '\n'
+			#fingerprint = ip[2].fingerprint(hashes.SHA256())
 			#sigBytes = ip[2].signature
 			#bytes = ip[2].tbs_certificate_bytes
 
@@ -59,12 +70,19 @@ def main():
 			#	str(notValidBefore)+','+str(notValidAfter)+','+str(issuer)+','+str(subject)+','+\
 			#	str(hashAlg)
 
-		else:
-			c = "no cert or error"
+			f.write(c)
 
-		f = open(ip[0]+"_cert.txt", 'w')
-		f.write(c)
-		f.close()
+		else:
+			# if there is an error, skip adding it to the csv but save in a list to print at the end of the program
+			erroredIps.append((ip[0], ip[1]))
+
+	
+	f.close()
+
+	if len(erroredIps) > 0:
+		print "unable to aquire certs for some IPs:"
+		for item in erroredIps:
+			print item
 
 if __name__ == "__main__":
 	main()
