@@ -66,12 +66,6 @@ subject locality name, subject organization name, subject common name, hash algo
 			#sigBytes = ip[2].signature
 			#bytes = ip[2].tbs_certificate_bytes
 
-			#there has to be a better way to do this...but the certificate isn't iterable...
-			# yay! better way found above
-			#c = str(version)+','+str(fingerprint)+','+str(serial)+','+str(publicKey)+','+\
-			#	str(notValidBefore)+','+str(notValidAfter)+','+str(issuer)+','+str(subject)+','+\
-			#	str(hashAlg)
-
 			f.write(c)
 
 		else:
