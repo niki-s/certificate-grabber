@@ -19,7 +19,7 @@ def main():
 	for line in f:
 		line = line.rstrip("\n")
 		print line
-		iplist.append(line.split(" "))
+		iplist.append(line.split(":"))
 
 	f.close()
 	# fetch and decode certificates
