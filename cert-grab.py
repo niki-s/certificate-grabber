@@ -27,7 +27,6 @@ def main():
 		try:
 			cert = ssl.get_server_certificate((ip[0], int(ip[1])))
 			cert_txt = x509.load_pem_x509_certificate(cert.encode('ascii','ignore'), default_backend())
-			#print type(cert_txt)
 			ip.append(cert_txt)
 		except:
 			ip.append("no cert or error")
