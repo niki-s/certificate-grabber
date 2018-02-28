@@ -66,13 +66,13 @@ def main():
 			# it took way too long to come up with this, why is the response given as a list??
 			for oid in NameOIDList:
 				try:
-					c = c  + ',' + str(ip[2].issuer.get_attributes_for_oid(oid)[0].value)
+					c = c  + ',' + str(ip[2].issuer.get_attributes_for_oid(oid)[0].value).replace(',', '')
 				except:
 					c = c  + ', '
 
 			for oid in NameOIDList:
 				try:
-					c = c  + ',' + str(ip[2].subject.get_attributes_for_oid(oid)[0].value)
+					c = c  + ',' + str(ip[2].subject.get_attributes_for_oid(oid)[0].value).replace(',', '')
 				except:
 					c = c  + ', '
 			# print ip[2].issuer.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)[0].value
