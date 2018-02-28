@@ -3,8 +3,14 @@ import ssl
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+from cryptography.x509.oid import NameOID
 import sys
 
+# find the list of possible nameOIDs here: https://cryptography.io/en/latest/x509/reference/#cryptography.x509.oid.NameOID
+# for expansion
+NameOIDList = [NameOID.COMMON_NAME, NameOID.COUNTRY_NAME, NameOID.STATE_OR_PROVINCE_NAME,
+	NameOID.LOCALITY_NAME, NameOID.STREET_ADDRESS, NameOID.ORGANIZATION_NAME,
+	NameOID.SERIAL_NUMBER]
 
 def main():
 	# open the file listed in the command line
@@ -36,9 +42,12 @@ def main():
 	f = open("results_certs_grab.csv", 'w')
 
 	# insert labels for all the columns as the first entry
-	c = "ip, port, version, serial number, public key length, not valid before, not valid after, issuer country name,\
-issuer organization name, issuer common name, subject country name, subject state or province, \
-subject locality name, subject organization name, subject common name, hash algorithm \n"
+	c = "ip, port, version, serial number, public key length, not valid before, not valid after,\
+	 issuer common name, issuer country name, issuer state or province, issuer locality,\
+	 issuer street address, issuer organization name, issuer serial number,\
+	 subject common name, subject country name, subject state or province, subject locality,\
+	 subject street address, subject organization name, subject serial number,\
+	 hash algorithm \n"
 	f.write(c)
 
 	for ip in iplist:
@@ -52,12 +61,36 @@ subject locality name, subject organization name, subject common name, hash algo
 			c = c  + ',' + str(ip[2].public_key().key_size)
 			c = c  + ',' + str(ip[2].not_valid_before)
 			c = c  + ',' + str(ip[2].not_valid_after)
-			for attribute in ip[2].issuer: 
-				#countryName, organizationName, commonName
-				c = c  + ',' + str(attribute.value)
-			for attribute in ip[2].subject:
-				#countryName, stateOrProvinceName, localityName, organizationName, commonName
-				c = c  + ',' + str(attribute.value)
+
+			# here comes a nice ty except of strangeness
+			# it took way too long to come up with this, why is the response given as a list??
+			for oid in NameOIDList:
+				try:
+					c = c  + ',' + str(ip[2].issuer.get_attributes_for_oid(oid)[0].value)
+				except:
+					c = c  + ', '
+
+			for oid in NameOIDList:
+				try:
+					c = c  + ',' + str(ip[2].subject.get_attributes_for_oid(oid)[0].value)
+				except:
+					c = c  + ', '
+			# print ip[2].issuer.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)[0].value
+			# print ip[2].issuer.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
+			# try:
+			# 	print ip[2].issuer.get_attributes_for_oid(NameOID.LOCALITY_NAME)[0].value
+			# except:
+			# 	print " "
+			# print "-"
+
+			
+			# for attribute in ip[2].issuer: 
+			# 	#countryName, organizationName, commonName
+			# 	print str(attribute.oid)
+			# 	c = c  + ',' + str(attribute.value)
+			# for attribute in ip[2].subject:
+			# 	#countryName, stateOrProvinceName, localityName, organizationName, commonName
+			# 	c = c  + ',' + str(attribute.value)
 
 			c = c  + ',' + str(ip[2].signature_hash_algorithm.name)
 			c = c + '\n'
