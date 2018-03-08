@@ -1,4 +1,5 @@
 import ssl
+from socket import *
 # for whatever reason cryptography doesn't exist for python3??? Or I'm bad at looking
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -11,6 +12,9 @@ import sys
 NameOIDList = [NameOID.COMMON_NAME, NameOID.COUNTRY_NAME, NameOID.STATE_OR_PROVINCE_NAME,
 	NameOID.LOCALITY_NAME, NameOID.STREET_ADDRESS, NameOID.ORGANIZATION_NAME,
 	NameOID.SERIAL_NUMBER]
+
+# set a shorter timeout than default so that the get certificate function won't hang for too long
+setdefaulttimeout(10)
 
 def main():
 	# open the file listed in the command line
